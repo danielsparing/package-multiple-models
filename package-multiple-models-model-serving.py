@@ -61,7 +61,7 @@ n_models = 4
 for i in range(n_models):
     with mlflow.start_run() as run:
         lr = ElasticNet(alpha=0.05, l1_ratio=0.05, random_state=42)
-        model = lr.fit(train_x, train_y)
+        model = lr.fit(train_x, train_y * 0 + i)
         mv = mlflow.register_model(f'runs:/{run.info.run_id}/model', f'multimodel-serving-{i}')
         client = MlflowClient()
         client.transition_model_version_stage(f'multimodel-serving-{i}', mv.version, "Production", archive_existing_versions=True)
@@ -177,4 +177,9 @@ input_example
 
 # COMMAND ----------
 
+model.predict(input_example)
+
+# COMMAND ----------
+
+input_example["locale"] = "centralus"
 model.predict(input_example)
