@@ -81,7 +81,7 @@ class MultiModelPyfunc(mlflow.pyfunc.PythonModel):
         self.models = []
         self.n_models = 4
         for i in range(self.n_models):
-            self.models.append(mlflow.sklearn.load_model(context.artifacts[f'model-{i}']))
+            self.models.append(mlflow.sklearn.load_model(f"{context.artifacts[f'model']}/model-{i}"))
     
     def select_model(self, model_input):
         if not isinstance(model_input, pd.DataFrame):
@@ -115,11 +115,12 @@ class MultiModelPyfunc(mlflow.pyfunc.PythonModel):
 
 # COMMAND ----------
 
+import os.path 
+
 n_models = 4
-paths = []
 for i in range(n_models):
-    paths.append(mlflow.artifacts.download_artifacts(f'models:/multimodel-serving-{i}/Production'))
-artifacts = {f'model-{i}': paths[i] for i in range(n_models)}
+    path = mlflow.artifacts.download_artifacts(f'models:/multimodel-serving-{i}/Production', dst_path=f'models/model-{i}')
+artifacts = {f'model': os.path.dirname(os.path.normpath(path))}
 
 # COMMAND ----------
 
